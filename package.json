@@ -1,0 +1,19 @@
+{
+  "name": "fullstack",
+  "version": "1.0.0",
+  "description": "my first fullstack node project",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ben40d9/fullstack-proj.git"
+  },
+  "author": "Ben Paley <benpaley6@gmail.com>",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/ben40d9/fullstack-proj/issues"
+  },
+  "homepage": "https://github.com/ben40d9/fullstack-proj#readme"
+}
