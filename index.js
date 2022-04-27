@@ -63,10 +63,24 @@ MongoClient.connect("mongodb+srv://ben_1:benny1234@cluster0.daout.mongodb.net/my
 
         })
 
+        app.delete('/notes', (req, res) => {
+            notesCollection.deleteOne(
+                {name: req.body.name },
+            )
+            .then(result => {
+                if (result.deletedCount === 0) {
+                    return res.json('No note to delete')
+                }
+                res.json('Deleted Note')
+            })
+            .catch(error => console.error(error))
+        })
+
 
 
         app.listen(3000);
         
     })
+    .catch(err => console.error(err))
             
 
