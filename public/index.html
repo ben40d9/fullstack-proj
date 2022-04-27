@@ -7,38 +7,125 @@
     <title>Take Notes</title>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        niceBlue: '#4169e1'
+                    }
+                }
+            }
+        }
+    </script>
 </head>
 <body class = "bg-slate-200">
     <script>
         $(document).ready(async function (){
+            //fetch notes
             const getNotesRequest = await fetch("/notes")
             const notes = await getNotesRequest.json()
+
+            if (notes.length === 0) {
+                $('#noNotes').show()
+
+            }
+
+            //put notes inside of <li> notes on empty UL
             notes.forEach(note => {
-                $('app.get').append(
+
+                //show the list of notes in list
+                $('#listOfNotes').append(
                     `<li>${note.name}: ${note.note}</li>`
                 ) 
 
+                //populate 
+                $('#deleteNoteDropdown').append(
+                    `<option value = "${note.name}">${note.name}</option>`
+                )
+
+            })
+
+            //listen for click
+            $('#addNewNote').click(async () => {
+
+                //create request body
+                const body = JSON.stringify({
+                    name: $('#newNoteName').val(),
+                    note: $('#newNoteText').val()
+                })
+
+                //make POST request to API from text inputs
+                const createNoteResponse = await fetch('/notes', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: body
+                })
+
+                //if the response from the API is bad, jam an error message into the "#errorMessage" <p>
+                // and return out of the handler
+                if (!createNoteResponse.ok) {
+                    $('#errorMessage').text('Something went wrong with the request.')
+                    return
+                }
+                //if we make it to this point in the code, the response from the API was okay.
+                //this means we can refresh the page to see our new note added to the list
+                //because the fetch call in the begining of this script section will re-run
+                window.location.href = '/'
+            })
+
+            //setup a click listener for the delete button
+            $('#deleteNote').click(async () => {
+                const deleteNoteResponse = await fetch('/notes', {
+                    method: 'DELETE',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        name: $('#deleteNoteDropdown').val()
+                    })
+                })
+
+                if (!deleteNoteResponse.ok) {
+                    $('#errorMessage').text('Something went wrong with the request.')
+                    return
+                }
+                window.location.href = '/'
             })
         })
     </script>
 
-    <div class = "flex flex-row justify-center mb-6">
+    <div class = "flex flex-row justify-center mb-6 text-niceBlue">
         <h1 class ="text-4xl px-4 py-2 mt-6 border border-black rounded-lg" id = "myInfo"> Take Notes</h1>
     </div>
 
+    <p class = "mb-4 text-center text-red-500" id = "errorMessage"></p>
+
     <div class = "grid grid-cols-3 gap-4 mx-4">
-        <form id = "add-note">
-            <div class = "flex flex-col place-items-center border border-black">
-                <h1 class = "text-lg mb-4">Add Note</h1>
-                <input class = "px-4 py-2 rounded-lg shadow-lg mb-4" type = "text" placeholder = "Name of Note">
-                <textarea class="px-4 py-2 rounded-lg shadow-lg mb-4" placeholder="Your Note"></textarea>
-                <button class="bg-blue-500 hover:bg-blue-400 text-white font-bold py-2 px-4 border-b-4 border-blue-700 hover:border-blue-500 rounded" type="button">
-                    Submit
-                </button>
-            </div>
-        </form>
-        <div class = "border border-black text-center">hi</div>
-        <div class = "border border-black text-center">hi</div>
+        <!-- first grid column-->
+        <div class = "flex flex-col place-items-center border border-black">
+            <h1 class = "text-lg mb-4">Add Note</h1>
+            <input id = "newNoteName" class = "px-4 py-2 rounded-lg shadow-lg mb-4" type = "text" placeholder = "Name of Note">
+            <textarea id = "newNoteText" class="px-4 py-2 rounded-lg shadow mb-4 w-[75%] h-[12rem]" placeholder="Your Note"></textarea>
+            <button id = "addNewNote" class="bg-blue-500 hover:bg-blue-400 text-white font-bold py-2 px-4 border-b-4 border-blue-700 hover:border-blue-500 rounded">Save</button>
+        </div>
+        
+        <!-- second grid column-->
+        <div class = "border border-black text-center">
+            <ul id = "listOfNotes">
+            </ul>
+            <p id = "noNotes" class="pt-4" hidden>No Notes To Display</p>
+        </div>
+
+        <!-- third grid column-->
+        <div class = "border border-black text-center">
+            <select id = "deleteNoteDropdown">
+
+            </select>
+            <button id = "deleteNote" class = "bg-red-500 hover:bg-red-400 text-white font-bold py-2 px-4 border-b-4 border-red-700 hover:border-red-500 rounded">Delete</button>
+        </div>
     </div>
     
 
