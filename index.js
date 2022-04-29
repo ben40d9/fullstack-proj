@@ -1,5 +1,6 @@
 const express = require('express');
 const bodyParser = require('body-parser');
+const basicAuth = require('express-basic-auth');
 const path = require('path');
 const app = express();
 const MongoClient = require('mongodb').MongoClient
@@ -19,6 +20,13 @@ MongoClient.connect("mongodb+srv://ben_1:benny1234@cluster0.daout.mongodb.net/my
         app.use(express.static(path.join(__dirname, 'public')));//in one line of code we have hosted an entore website
         app.use(bodyParser.json());
         app.use(bodyParser.urlencoded({ extended: true}));
+
+        app.use(basicAuth({
+            users: {
+                'ben': 'admin'
+            },
+            challenge: true,
+        }))
 
         //logging middleware
         app.use((req, res, next) => {
