@@ -5,6 +5,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Take Notes</title>
+    <link rel = "icon" href = "https://img.icons8.com/fluency/48/000000/note.png">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
@@ -39,11 +40,26 @@
                     `<li>${note.name}: ${note.note}</li>`
                 ) 
 
-                //populate 
-                $('#deleteNoteDropdown').append(
+                //populate to dropdown menu with note names
+                $('#editNoteDropdown').append(
                     `<option value = "${note.name}">${note.name}</option>`
                 )
 
+            })
+
+            //when the value changes in the <select id = "editNoteDropdown"
+            $('#editNoteDropdown').change(() => {
+                const selectedNoteName = $('#editNoteDropdown').val()
+
+                if(selectedNoteName === 'blank') {
+                    $('#editNoteName').val('')
+                    $('#editNoteText').val('')
+                } else {
+                    const selectedNote = notes.find(note => note.name === selectedNoteName)
+
+                    $('#editNoteName').val(selectedNote.name)
+                    $('#editNoteText').val(selectedNote.note)
+                }
             })
 
             //listen for click
@@ -76,6 +92,28 @@
                 window.location.href = '/'
             })
 
+            $('#saveNoteEdit').click(async() => {
+                const editNoteResponse = await fetch ('/notes', {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        noteToUpdate: $('#editNoteDropdown').val(),
+                        name: $('#editNoteName').val(),
+                        note: $('#editNoteText').val()
+                    })
+                })
+
+                if (!editNoteResponse.ok) {
+                    $('#errorMessage').text('Note editing failed.')
+                    return
+                }
+                
+                window.location.href = '/'
+                
+            })
+
             //setup a click listener for the delete button
             $('#deleteNote').click(async () => {
                 const deleteNoteResponse = await fetch('/notes', {
@@ -84,7 +122,7 @@
                         'Content-Type': 'application/json'
                     },
                     body: JSON.stringify({
-                        name: $('#deleteNoteDropdown').val()
+                        name: $('#editNoteDropdown').val()
                     })
                 })
 
@@ -121,9 +159,20 @@
 
         <!-- third grid column-->
         <div class = "border border-black text-center">
-            <select id = "deleteNoteDropdown">
+            <h3>Edit/Delete Note</h3>
 
+            <select id = "editNoteDropdown" class ="px-4 py-2 my-2 shadow">
+                <option value = "blank">Select a note</option>
             </select>
+
+            <div id = "editNoteArea">
+                <input id = "editNoteName" class = "px-4 py-2 rounded-lg shadow-lg mb-4" type = "text" placeholder = "Choose note to edit">
+                <textarea id = "editNoteText" class="px-4 py-2 rounded-lg shadow mb-4 w-[75%] h-[12rem]" placeholder="Choose a note and its text will display here"></textarea>
+            </div>
+
+            <br />
+
+            <button id = "saveNoteEdit" class = "bg-blue-500 hover:bg-blue-400 text-white font-bold py-2 px-4 border-b-4 border-blue-700 hover:border-blue-500 rounded">Save</button>
             <button id = "deleteNote" class = "bg-red-500 hover:bg-red-400 text-white font-bold py-2 px-4 border-b-4 border-red-700 hover:border-red-500 rounded">Delete</button>
         </div>
     </div>
