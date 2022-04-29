@@ -52,6 +52,8 @@ MongoClient.connect("mongodb+srv://ben_1:benny1234@cluster0.daout.mongodb.net/my
         })
 
         app.put('/notes', (req, res) => {
+            //auth middleware runs
+            // need users id here to see which note package to send
             notesCollection.findOneAndUpdate(
                 { name: req.body.noteToUpdate },
                 {
