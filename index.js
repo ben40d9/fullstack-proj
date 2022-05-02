@@ -26,7 +26,11 @@ MongoClient.connect("mongodb+srv://ben_1:benny1234@cluster0.daout.mongodb.net/my
                 'ben': 'admin'
             },
             challenge: true,
+            unauthorizedResponse: (req) => {
+                return `unauthorized. ip: ${req.ip}`
+            }
         }))
+
 
         //logging middleware
         app.use((req, res, next) => {
